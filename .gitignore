@@ -1,0 +1,7 @@
+# Python and IPython
+**/__pycache__
+**/.ipynb_checkpoints
+**/*.pyc
+
+# Tests on Jupyter notebooks
+**/ch*exercise.ipynb
