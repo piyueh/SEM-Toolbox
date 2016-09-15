@@ -9,7 +9,7 @@
 """Definition of the Polynomial class"""
 
 import numpy
-from poly_operations import eval_poly, der_poly
+from utils.poly.poly_operations import eval_poly, der_poly
 
 
 class Polynomial(object):
