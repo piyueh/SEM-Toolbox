@@ -9,7 +9,7 @@
 """Definition of the Polynomial class"""
 
 import numpy
-from utils.poly.poly_operations import eval_poly, der_poly
+from utils.poly.poly_operations import eval_poly, der_poly, find_roots
 
 
 class Polynomial(object):
@@ -19,6 +19,7 @@ class Polynomial(object):
         n: the order of the polynomial
         coeffs: coefficient vector of the polynomial
         defined: a boolean indicating whether the polynomial is defined
+        roots: the roots of the polynomial
     """
 
     def __init__(self, _coeffs=None):
@@ -36,6 +37,7 @@ class Polynomial(object):
             self.n = None
             self.coeffs = None
             self.defined = False
+            self.roots = None
 
     def __call__(self, x):
         """__call__
@@ -47,6 +49,10 @@ class Polynomial(object):
             the value at x of the polynomial
         """
         return eval_poly(x, self.coeffs)
+
+    def __find_roots(self):
+        """calculate the roots and store them in self.root"""
+        self.roots = find_roots(self.coeffs)
 
     def set(self, _coeffs):
         """set
@@ -63,6 +69,7 @@ class Polynomial(object):
         self.n = _coeffs.size
         self.coeffs = _coeffs.copy()
         self.defined = True
+        self.__find_roots()
 
     def derive(self, o=1):
         assert o >= 1, "The order of derivative should >= 1"
