@@ -72,6 +72,7 @@ def find_roots(C, z=None):
         "The order of the polynomial is less than 1, no root exists"
 
     C = C / C[-1]
+    C = C.astype(numpy.complex256)
     n = C.size - 1
     stop = numpy.array([False]*n)
 
@@ -81,6 +82,8 @@ def find_roots(C, z=None):
         assert isinstance(z, numpy.ndarray), "z is not a NumPy array"
         assert len(z.shape) == 1,  "z is not a 1D array"
         assert z.size == n, "z is not in the same size with polynomial order"
+
+    z = z.astype(numpy.complex256)
 
     N = 0
     while not stop.all():
@@ -94,11 +97,37 @@ def find_roots(C, z=None):
                 stop[i] = True
 
         N += 1
-        if N > 1000:
-            raise InfLoopError(1000)
+        if N > 100000:
+            print(z)
+            raise InfLoopError(100000)
 
-    z = numpy.where(numpy.abs(z.real) < 1e-14, z.imag*1j, z)
-    z = numpy.where(numpy.abs(z.imag) < 1e-14, z.real, z)
+    z = z.astype(numpy.complex128)
+    z = numpy.where(numpy.abs(z.real) < 1e-8, z.imag*1j, z)
+    z = numpy.where(numpy.abs(z.imag) < 1e-8, z.real, z)
     z = numpy.real(z) if (z.imag == 0).all() else z
 
     return z
+
+
+def comp_matrix(C):
+    """construct the companion matrix of the polynomial
+
+    Args:
+        C: coefficient array
+
+    Returns:
+        companion matrix
+    """
+    assert isinstance(C, numpy.ndarray), \
+        "The coefficient array is not a NumPy array"
+    assert len(C.shape) == 1, "C is not a 1D array"
+    assert C.size > 1, \
+        "The order of the polynomial is less than 1, no root exists"
+
+    C = C / C[-1]
+    n = C.size - 1
+    m = numpy.diag([1.]*(n-1), -1)
+
+    m[:, -1] -= C[:-1]
+
+    return m
