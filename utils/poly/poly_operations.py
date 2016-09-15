@@ -56,7 +56,7 @@ def der_poly(C):
 
 
 def find_roots(C, z=None):
-    """find the roots of the polynomial, using Laguerre's method
+    """find the roots of the polynomial, using Durand-Kerner method
 
     Args:
         C: coefficient array
