@@ -3,7 +3,7 @@
 """Definition of the InfLoopError class"""
 
 
-from Error import Error
+from utils.errors.Error import Error
 
 
 class InfLoopError(Error):
