@@ -3,7 +3,7 @@
 """__init__.py"""
 
 
-from misc import *
+from utils.misc.misc import *
 
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"
