@@ -50,6 +50,21 @@ class Polynomial(object):
         """
         return eval_poly(x, self.coeffs)
 
+    def __repr__(self):
+        """__repr__"""
+
+        return "{0}({1})".format(self.__class__, self.coeffs)
+
+    def __str__(self):
+        """__str__"""
+
+        s = "{0}".format(self.coeffs[0])
+        for i, c in enumerate(self.coeffs[1:]):
+            s += " + "
+            s += "{0} x^{1}".format(c, i)
+
+        return s
+
     def __find_roots(self):
         """calculate the roots and store them in self.root"""
         self.roots = find_roots(self.coeffs)
@@ -66,7 +81,7 @@ class Polynomial(object):
             "coeffs is not a numpy.ndarray"
         assert len(_coeffs.shape) == 1, "_coeffs is not a 1D array"
 
-        self.n = _coeffs.size
+        self.n = _coeffs.size - 1
         self.coeffs = _coeffs.copy()
         self.defined = True
         self.__find_roots()
