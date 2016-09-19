@@ -40,18 +40,14 @@ class GaussJacobi(object):
             _alpha: the alpha for the Jacobi polynomial
             _beta: the beta for the Jacobi polynomial
         """
-        assert _n >= 1, \
-            "The order of quadrature should greater than or equal to 1."
 
         self.n = _n
+        self.__check_order__()
+
         self.alpha = _alpha
         self.beta = _beta
 
-        if self.n == 1:
-            self.nodes = numpy.array([0.])
-            self.weights = numpy.array([2.])
-        else:
-            self.__quad_points__()
+        self.__quad_points__()
 
     def __call__(self, f, xmin=-1, xMax=1):
         """Carry out quadrature integration on the one-variable function f
@@ -92,15 +88,25 @@ class GaussJacobi(object):
         Calculate the locations and weights of quadrature points
         """
 
-        p = Jacobi(self.n, self.alpha, self.beta)
-        self.nodes = p.roots
+        if self.n == 1:
+            self.nodes = numpy.array([0.])
+            self.weights = numpy.array([2.])
+        else:
+            p = Jacobi(self.n, self.alpha, self.beta)
+            self.nodes = p.roots
 
-        c1 = 2**(self.alpha+self.beta+1)
-        c1 *= gamma(self.alpha+self.n+1)
-        c1 *= gamma(self.beta+self.n+1)
-        c1 /= factorial(self.n)
-        c1 /= gamma(self.alpha+self.beta+self.n+1)
-        c1 /= (1. - self.nodes**2)
+            c1 = 2**(self.alpha+self.beta+1)
+            c1 *= gamma(self.alpha+self.n+1)
+            c1 *= gamma(self.beta+self.n+1)
+            c1 /= factorial(self.n)
+            c1 /= gamma(self.alpha+self.beta+self.n+1)
+            c1 /= (1. - self.nodes**2)
 
-        c2 = p.derive()(self.nodes)
-        self.weights = c1 / c2 / c2
+            c2 = p.derive()(self.nodes)
+            self.weights = c1 / c2 / c2
+
+    def __check_order__(self):
+        """Check the order of quadrature"""
+
+        assert self.n >= 1, \
+            "Gauss-Jacobi quadrature requires the order to be greater than 0"
