@@ -103,6 +103,33 @@ def find_roots(C, z=None):
     return z
 
 
+def find_coeffs(R):
+    """construct/find the coefficients of a polynomial by its roots
+
+    Args:
+        R: array of roots
+
+    Returns:
+        the coefficient array
+    """
+
+    check_R(R)
+    n = R.size
+    pi = numpy.ones(n, dtype=numpy.complex256)
+    pi = numpy.hstack((-R[:, None], pi[:, None]))
+
+    p = numpy.ones(1, dtype=numpy.complex256)
+    for i in range(n):
+        p = mul_poly(p, pi[i, :])
+
+    p = p.astype(numpy.complex128)
+    p = numpy.where(numpy.abs(p.real) < 1e-12, p.imag*1j, p)
+    p = numpy.where(numpy.abs(p.imag) < 1e-12, p.real, p)
+    p = numpy.real(p) if (p.imag == 0).all() else p
+
+    return p
+
+
 def comp_matrix(C):
     """construct the companion matrix of the polynomial
 
@@ -164,7 +191,11 @@ def mul_poly(C1, C2):
     nC = numpy.zeros(nSize + 1)  # coeff. array of resulting polynomial
 
     for i, c in enumerate(C1):
-        nC[i:i+C2.size] += c * C2
+        try:
+            nC[i:i+C2.size] += c * C2
+        except TypeError:
+            nC = nC.astype(numpy.complex256)
+            nC[i:i+C2.size] += c * C2
 
     return nC
 
@@ -180,3 +211,16 @@ def check_C(C):
     assert len(C.shape) == 1, "C is not a 1D array"
     assert C.size >= 1, \
         "The order of the polynomial should >= 0"
+
+
+def check_R(R):
+    """check the type and number of the polynomial root
+
+    Args:
+        R: polynomial roots
+    """
+    assert isinstance(R, numpy.ndarray), \
+        "The array of the roots is not a NumPy array"
+    assert len(R.shape) == 1, "R is not a 1D array"
+    assert R.size > 1, \
+        "The number of the polynomial roots should > 0"

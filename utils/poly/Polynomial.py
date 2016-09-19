@@ -9,7 +9,8 @@
 """Definition of the Polynomial class"""
 
 import numpy
-from utils.poly.poly_operations import eval_poly, der_poly, find_roots
+from utils.poly.poly_operations import eval_poly, der_poly
+from utils.poly.poly_operations import find_roots, find_coeffs
 from utils.poly.poly_operations import add_polys, mul_poly
 
 
@@ -23,7 +24,7 @@ class Polynomial(object):
         roots: the roots of the polynomial
     """
 
-    def __init__(self, _coeffs=None):
+    def __init__(self, _coeffs=None, _roots=None):
         """__init__
 
         Args:
@@ -32,8 +33,10 @@ class Polynomial(object):
         Returns: None
         """
 
-        if _coeffs is not None:
-            self.set(_coeffs)
+        if _roots is not None:
+            self.set_from_roots(_roots)
+        elif _coeffs is not None:
+            self.set_from_coeffs(_coeffs)
         else:
             self.n = None
             self.coeffs = None
@@ -85,13 +88,15 @@ class Polynomial(object):
         """calculate the roots and store them in self.root"""
         self.roots = find_roots(self.coeffs)
 
-    def set(self, _coeffs):
-        """set
+    def __find_coeffs(self):
+        """calculate the coefficients using its roots"""
+        self.coeffs = find_coeffs(self.roots)
+
+    def set_from_coeffs(self, _coeffs):
+        """set the polynomial instance using its coefficients
 
         Args:
             _coeffs: coefficient vector of the polynomial
-
-        Returns:
         """
         assert isinstance(_coeffs, numpy.ndarray), \
             "coeffs is not a numpy.ndarray"
@@ -101,6 +106,21 @@ class Polynomial(object):
         self.coeffs = _coeffs.copy()
         self.defined = True
         self.__find_roots()
+
+    def set_from_roots(self, _roots):
+        """set the polynomial instance using its roots
+
+        Args:
+            _roots: array of roots
+        """
+        assert isinstance(_roots, numpy.ndarray), \
+            "coeffs is not a numpy.ndarray"
+        assert len(_roots.shape) == 1, "_roots is not a 1D array"
+
+        self.n = _roots.size
+        self.roots = _roots.copy()
+        self.defined = True
+        self.__find_coeffs()
 
     def derive(self, o=1):
         assert o >= 1, "The order of derivative should >= 1"
