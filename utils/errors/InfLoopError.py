@@ -1,7 +1,12 @@
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+#
+# Copyright © 2016 Pi-Yueh Chuang <pychuang@gwu.edu>
+#
+# Distributed under terms of the MIT license.
 
 """Definition of the InfLoopError class"""
-
 
 from utils.errors.Error import Error
 

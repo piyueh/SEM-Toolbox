@@ -6,6 +6,10 @@
 #
 # Distributed under terms of the MIT license.
 
-"""
-__init__.py for quadrature subpackage
-"""
+"""__init__.py for quadrature subpackage"""
+
+from utils.quadrature.GaussJacobi import GaussJacobi
+from utils.quadrature.GaussLobattoJacobi import GaussLobattoJacobi
+
+__version__ = "alpha"
+__author__ = "Pi-Yueh Chuang"
