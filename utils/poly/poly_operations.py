@@ -22,9 +22,7 @@ def eval_poly(x, C):
     Returns:
         value
     """
-    assert isinstance(C, numpy.ndarray), \
-        "The coefficient array is not a NumPy array"
-    assert len(C.shape) == 1, "_coeffs is not a 1D array"
+    check_C(C)
 
     if C.size == 2:
         return C[0] + C[1] * x
@@ -41,9 +39,7 @@ def der_poly(C):
     Returns:
         the coefficient array of the derived polynomial
     """
-    assert isinstance(C, numpy.ndarray), \
-        "The coefficient array is not a NumPy array"
-    assert len(C.shape) == 1, "C is not a 1D array"
+    check_C(C)
 
     if C.size == 1:
         return numpy.zeros(1)
@@ -65,9 +61,7 @@ def find_roots(C, z=None):
     Returns:
         roots
     """
-    assert isinstance(C, numpy.ndarray), \
-        "The coefficient array is not a NumPy array"
-    assert len(C.shape) == 1, "C is not a 1D array"
+    check_C(C)
     assert C.size > 1, \
         "The order of the polynomial is less than 1, no root exists"
 
@@ -118,11 +112,9 @@ def comp_matrix(C):
     Returns:
         companion matrix
     """
-    assert isinstance(C, numpy.ndarray), \
-        "The coefficient array is not a NumPy array"
-    assert len(C.shape) == 1, "C is not a 1D array"
+    check_C(C)
     assert C.size > 1, \
-        "The order of the polynomial is less than 1, no root exists"
+        "The order of the polynomial is less than 1, no companion matrix"
 
     C = C / C[-1]
     n = C.size - 1
@@ -131,3 +123,60 @@ def comp_matrix(C):
     m[:, -1] -= C[:-1]
 
     return m
+
+
+def add_polys(C1, C2):
+    """add two polynomials
+
+    Args:
+        C1: coefficient array
+        C2: coefficient array
+
+    Returns:
+        a new coefficient array representing the sum of the two polynomials
+    """
+    check_C(C1)
+    check_C(C2)
+
+    if C1.size < C2.size:
+        C1 = numpy.pad(C1, (0, C2.size-C1.size), 'constant', constant_values=0)
+    if C2.size < C1.size:
+        C2 = numpy.pad(C2, (0, C1.size-C2.size), 'constant', constant_values=0)
+
+    return C1 + C2
+
+
+def mul_poly(C1, C2):
+    """multiply two polynomials
+
+    Args:
+        C1: coefficient array
+        C2: coefficient array
+
+    Returns:
+        a new coefficient array representing the multiplication of the
+        two polynomials
+    """
+    check_C(C1)
+    check_C(C2)
+
+    nSize = (C1.size - 1) + (C2.size - 1)  # the order of resulting polynomial
+    nC = numpy.zeros(nSize + 1)  # coeff. array of resulting polynomial
+
+    for i, c in enumerate(C1):
+        nC[i:i+C2.size] += c * C2
+
+    return nC
+
+
+def check_C(C):
+    """check the type and order of the polynomial
+
+    Args:
+        C: coefficient array
+    """
+    assert isinstance(C, numpy.ndarray), \
+        "The coefficient array is not a NumPy array"
+    assert len(C.shape) == 1, "C is not a 1D array"
+    assert C.size >= 1, \
+        "The order of the polynomial should >= 0"

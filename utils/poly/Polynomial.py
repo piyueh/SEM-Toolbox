@@ -10,6 +10,7 @@
 
 import numpy
 from utils.poly.poly_operations import eval_poly, der_poly, find_roots
+from utils.poly.poly_operations import add_polys, mul_poly
 
 
 class Polynomial(object):
@@ -64,6 +65,21 @@ class Polynomial(object):
             s += "{0} x^{1}".format(c, i)
 
         return s
+
+    def __add__(self, other):
+        """overloading the + operator"""
+
+        return Polynomial(add_polys(self.coeffs, other.coeffs))
+
+    def __sub__(self, other):
+        """overloading the - operator"""
+
+        return Polynomial(add_polys(self.coeffs, - other.coeffs))
+
+    def __mul__(self, other):
+        """overloading the * operator"""
+
+        return Polynomial(mul_poly(self.coeffs, other.coeffs))
 
     def __find_roots(self):
         """calculate the roots and store them in self.root"""
