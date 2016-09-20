@@ -52,6 +52,7 @@ def strip_trivial(z, tol=1e-8):
 
     Returns:
     """
+    # TODO implement different way to lower the dependence of numpy
     z = z.astype(numpy.complex128)
     z = numpy.where(numpy.abs(z.real) < tol, z.imag*1j, z)
     z = numpy.where(numpy.abs(z.imag) < tol, z.real, z)

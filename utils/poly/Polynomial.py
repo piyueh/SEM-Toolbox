@@ -226,3 +226,4 @@ class Polynomial(object):
             return Polynomial(der_poly(self.coeffs))
         else:
             return Polynomial(der_poly(self.coeffs)).derive(o-1)
+    # TODO add different method to return derivative
