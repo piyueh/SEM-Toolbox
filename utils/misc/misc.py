@@ -8,6 +8,7 @@
 
 """Some misc functions"""
 
+import numpy
 import functools
 
 
@@ -40,3 +41,20 @@ def gamma(n):
         (n-1)!
     """
     return factorial(n-1)
+
+
+def strip_trivial(z, tol=1e-8):
+    """if any element in array z is smaller than tol, we set it to zero
+
+    Args:
+        z: the array to be cleaned
+        tol: the tolerance
+
+    Returns:
+    """
+    z = z.astype(numpy.complex128)
+    z = numpy.where(numpy.abs(z.real) < tol, z.imag*1j, z)
+    z = numpy.where(numpy.abs(z.imag) < tol, z.real, z)
+    z = numpy.real(z) if (z.imag == 0).all() else z
+
+    return z

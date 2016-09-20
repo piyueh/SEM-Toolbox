@@ -10,10 +10,12 @@
 
 import numpy
 from utils.errors import InfLoopError
+from utils.misc import strip_trivial
 
 
-def eval_poly(x, C):
-    """evaluate the value of the polynomial at x using recursion
+def eval_poly_coeffs(x, C):
+    """providing polynomial coefficients, evaluate the value of the polynomial
+    at x using recursion
 
     Args:
         x: the point at where the value will be evaluated
@@ -27,7 +29,25 @@ def eval_poly(x, C):
     if C.size == 2:
         return C[0] + C[1] * x
     else:
-        return C[0] + x * eval_poly(x, C[1:])
+        return C[0] + x * eval_poly_coeffs(x, C[1:])
+
+
+def eval_poly_roots(x, R, leading=1):
+    """providing polynomial roots, evaluate the value of the polynomial at x
+
+    Args:
+        x: the point at where the value will be evaluated
+        C: coefficient array
+
+    Returns:
+        value
+    """
+    check_R(R)
+
+    if R.size == 1:
+        return (x - R[0]) * leading
+    else:
+        return (x - R[0]) * eval_poly_roots(x, R[1:], leading)
 
 
 def der_poly(C):
@@ -83,7 +103,7 @@ def find_roots(C, z=None):
     while not stop.all():
 
         for i in range(n):
-            delta = eval_poly(z[i], C) / \
+            delta = eval_poly_coeffs(z[i], C) / \
                 (numpy.prod(z[i]-z[:i]) * numpy.prod(z[i]-z[i+1:]))
             z[i] -= delta
 
@@ -95,10 +115,7 @@ def find_roots(C, z=None):
             print(z)
             raise InfLoopError(100000)
 
-    z = z.astype(numpy.complex128)
-    z = numpy.where(numpy.abs(z.real) < 1e-8, z.imag*1j, z)
-    z = numpy.where(numpy.abs(z.imag) < 1e-8, z.real, z)
-    z = numpy.real(z) if (z.imag == 0).all() else z
+    z = strip_trivial(z)
 
     return z
 
@@ -122,10 +139,7 @@ def find_coeffs(R):
     for i in range(n):
         p = mul_poly(p, pi[i, :])
 
-    p = p.astype(numpy.complex128)
-    p = numpy.where(numpy.abs(p.real) < 1e-12, p.imag*1j, p)
-    p = numpy.where(numpy.abs(p.imag) < 1e-12, p.real, p)
-    p = numpy.real(p) if (p.imag == 0).all() else p
+    p = strip_trivial(p)
 
     return p
 
@@ -197,6 +211,8 @@ def mul_poly(C1, C2):
             nC = nC.astype(numpy.complex256)
             nC[i:i+C2.size] += c * C2
 
+    nC = strip_trivial(nC)
+
     return nC
 
 
@@ -222,5 +238,5 @@ def check_R(R):
     assert isinstance(R, numpy.ndarray), \
         "The array of the roots is not a NumPy array"
     assert len(R.shape) == 1, "R is not a 1D array"
-    assert R.size > 1, \
+    assert R.size > 0, \
         "The number of the polynomial roots should > 0"
