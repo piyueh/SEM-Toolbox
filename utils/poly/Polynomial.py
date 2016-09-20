@@ -12,7 +12,7 @@ import numpy
 from utils.poly.poly_operations import eval_poly_coeffs, eval_poly_roots
 from utils.poly.poly_operations import der_poly
 from utils.poly.poly_operations import find_roots, find_coeffs
-from utils.poly.poly_operations import add_polys, mul_poly
+from utils.poly.poly_operations import add_polys, mul_poly, div_poly
 
 
 class Polynomial(object):
@@ -47,8 +47,16 @@ class Polynomial(object):
         """
 
         if (roots is not None):
+            if isinstance(roots, list):
+                roots = numpy.array(roots)
+            if isinstance(roots, float) or isinstance(roots, int):
+                roots = numpy.array([roots], dtype=numpy.float64)
             self.set_from_roots(roots, leading)
         elif (coeffs is not None):
+            if isinstance(coeffs, list):
+                coeffs = numpy.array(coeffs)
+            if isinstance(coeffs, float) or isinstance(coeffs, int):
+                coeffs = numpy.array([coeffs], dtype=numpy.float64)
             self.set_from_coeffs(coeffs)
         else:
             self.n = None
@@ -85,17 +93,87 @@ class Polynomial(object):
     def __add__(self, other):
         """overloading the + operator"""
 
-        return Polynomial(add_polys(self.coeffs, other.coeffs))
+        if isinstance(other, Polynomial):
+            return Polynomial(add_polys(self.coeffs, other.coeffs))
+        elif isinstance(other, int) or isinstance(other, float):
+            return self.__add__(Polynomial(other))
+        else:
+            raise TypeError("Can't add a Polynomial and a " + str(type(other)))
+
+    def __radd__(self, other):
+        """overloading the + operator"""
+
+        if isinstance(other, Polynomial):
+            return Polynomial(add_polys(self.coeffs, other.coeffs))
+        elif isinstance(other, int) or isinstance(other, float):
+            return Polynomial(other).__add__(self)
+        else:
+            raise TypeError("Can't add a Polynomial and a " + str(type(other)))
 
     def __sub__(self, other):
         """overloading the - operator"""
 
-        return Polynomial(add_polys(self.coeffs, - other.coeffs))
+        if isinstance(other, Polynomial):
+            return Polynomial(add_polys(self.coeffs, - other.coeffs))
+        elif isinstance(other, int) or isinstance(other, float):
+            return self.__sub__(Polynomial(other))
+        else:
+            raise TypeError(
+                "Can't subtract a " + str(type(other)) + " form a Polynomial")
+
+    def __rsub__(self, other):
+        """overloading the - operator"""
+
+        if isinstance(other, Polynomial):
+            return Polynomial(add_polys(other.coeffs, - self.coeffs))
+        elif isinstance(other, int) or isinstance(other, float):
+            return Polynomial(other).__sub__(self)
+        else:
+            raise TypeError(
+                "Can't subtract a Polynomial from a " + str(type(other)))
 
     def __mul__(self, other):
         """overloading the * operator"""
 
-        return Polynomial(mul_poly(self.coeffs, other.coeffs))
+        if isinstance(other, Polynomial):
+            return Polynomial(mul_poly(self.coeffs, other.coeffs))
+        elif isinstance(other, int) or isinstance(other, float):
+            return self.__mul__(Polynomial(other))
+        else:
+            raise TypeError(
+                "Can't multiply a Polynomial with a " + str(type(other)))
+
+    def __rmul__(self, other):
+        """overloading the * operator"""
+
+        if isinstance(other, Polynomial):
+            return Polynomial(mul_poly(self.coeffs, other.coeffs))
+        elif isinstance(other, int) or isinstance(other, float):
+            return Polynomial(other).__mul__(self)
+        else:
+            raise TypeError(
+                "Can't multiply a " + str(type(other)) + " with a Polynomial")
+
+    def __truediv__(self, other):
+        """overloading the / operator"""
+
+        if isinstance(other, Polynomial):
+            Q, R = div_poly(self.coeffs, other.coeffs)
+            return Polynomial(Q), Polynomial(R)
+        elif isinstance(other, int) or isinstance(other, float):
+            return Polynomial(self.coeffs / other)
+        else:
+            raise TypeError(
+                "Can't divide a Polynomial with a " + str(type(other)))
+
+    def __rtruediv__(self, other):
+        """overloading the / operator"""
+
+        if isinstance(other, Polynomial):
+            other.__div__(self)
+        else:
+            raise TypeError(
+                "Can't divide a " + str(type(other)) + " with a Polynomial")
 
     def __find_roots(self):
         """calculate the roots and store them in self.root"""

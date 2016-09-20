@@ -26,8 +26,8 @@ def eval_poly_coeffs(x, C):
     """
     check_C(C)
 
-    if C.size == 2:
-        return C[0] + C[1] * x
+    if C.size == 1:
+        return C[0]
     else:
         return C[0] + x * eval_poly_coeffs(x, C[1:])
 
@@ -82,8 +82,9 @@ def find_roots(C, z=None):
         roots
     """
     check_C(C)
-    assert C.size > 1, \
-        "The order of the polynomial is less than 1, no root exists"
+
+    if C.size == 1:
+        return None
 
     C = C / C[-1]
     C = C.astype(numpy.complex256)
@@ -214,6 +215,41 @@ def mul_poly(C1, C2):
     nC = strip_trivial(nC)
 
     return nC
+
+
+def div_poly(C1, C2):
+    """polynomial C1 divides by C2, i.e., C1 / C2 = Q + R
+
+    Requirement: the degree of C2 must be lower or equal to C1
+
+    Args:
+        C1: coefficient array
+        C2: coefficient array
+
+    Returns:
+        Q: quotient
+        R: remainder
+    """
+    check_C(C1)
+    check_C(C2)
+
+    assert C2.size <= C1.size, \
+        "The degree of polynomial C2 must be <= C1"
+
+    Q = numpy.zeros(C1.size - C2.size + 1, dtype=numpy.complex256)
+    R = C1.copy()
+
+    i = Q.size
+    while R.size >= C2.size:
+
+        Q[i-1] = R[-1] / C2[-1]
+        R = numpy.delete(R-mul_poly(Q[:i], C2), -1)
+        i -= 1
+
+    Q = strip_trivial(Q)
+    R = numpy.append(R[0], numpy.trim_zeros(strip_trivial(R[1:]), 'b'))
+
+    return Q, R
 
 
 def check_C(C):
