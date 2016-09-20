@@ -19,7 +19,7 @@ class GaussLobattoJacobi(GaussJacobi):
 
     For usage and attributes, please refer to Gauss-Jacobi class.
     """
-    def __quad_points__(self):
+    def __quad_points(self):
         """__quad_points__
 
         Calculate the locations and weights of quadrature points
@@ -45,7 +45,7 @@ class GaussLobattoJacobi(GaussJacobi):
         self.weights[0] *= (self.beta + 1.)
         self.weights[-1] *= (self.alpha + 1.)
 
-    def __check_order__(self):
+    def __check_order(self):
         """Check the order of quadrature"""
 
         assert self.n >= 2, \

@@ -42,12 +42,12 @@ class GaussJacobi(object):
         """
 
         self.n = _n
-        self.__check_order__()
+        self.__check_order()
 
         self.alpha = _alpha
         self.beta = _beta
 
-        self.__quad_points__()
+        self.__quad_points()
 
     def __call__(self, f, xmin=-1, xMax=1):
         """Carry out quadrature integration on the one-variable function f
@@ -82,7 +82,7 @@ class GaussJacobi(object):
 
         return s
 
-    def __quad_points__(self):
+    def __quad_points(self):
         """__quad_points__
 
         Calculate the locations and weights of quadrature points
@@ -105,7 +105,7 @@ class GaussJacobi(object):
             c2 = p.derive()(self.nodes)
             self.weights = c1 / c2 / c2
 
-    def __check_order__(self):
+    def __check_order(self):
         """Check the order of quadrature"""
 
         assert self.n >= 1, \
