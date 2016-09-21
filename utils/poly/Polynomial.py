@@ -74,7 +74,7 @@ class Polynomial(object):
         Returns:
             the value at x of the polynomial
         """
-        return self.__eval(x)
+        return self._eval(x)
 
     def __repr__(self):
         """__repr__"""
@@ -176,11 +176,11 @@ class Polynomial(object):
             raise TypeError(
                 "Can't divide a " + str(type(other)) + " with a Polynomial")
 
-    def __find_roots(self):
+    def _find_roots(self):
         """calculate the roots and store them in self.root"""
         self.roots = find_roots(self.coeffs)
 
-    def __find_coeffs(self, _leading):
+    def _find_coeffs(self, _leading):
         """calculate the coefficients using its roots"""
         self.coeffs = find_coeffs(self.roots) * _leading
 
@@ -197,9 +197,9 @@ class Polynomial(object):
         self.n = _coeffs.size - 1
         self.coeffs = _coeffs.copy()
         self.defined = True
-        self.__find_roots()
+        self._find_roots()
         self.eval_method = "C"
-        self.__eval = lambda x: eval_poly_coeffs(x, self.coeffs)
+        self._eval = lambda x: eval_poly_coeffs(x, self.coeffs)
 
     def set_from_roots(self, _roots, _leading):
         """set the polynomial instance using its roots
@@ -215,9 +215,9 @@ class Polynomial(object):
         self.n = _roots.size
         self.roots = _roots.copy()
         self.defined = True
-        self.__find_coeffs(_leading)
+        self._find_coeffs(_leading)
         self.eval_method = "R"
-        self.__eval = lambda x: eval_poly_roots(x, self.roots, self.coeffs[-1])
+        self._eval = lambda x: eval_poly_roots(x, self.roots, self.coeffs[-1])
 
     def derive(self, o=1):
         assert o >= 1, "The order of derivative should >= 1"
