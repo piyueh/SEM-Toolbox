@@ -9,6 +9,7 @@
 """Some misc functions"""
 
 import numpy
+import numbers
 import functools
 
 
@@ -59,3 +60,27 @@ def strip_trivial(z, tol=1e-8):
     z = numpy.real(z) if (z.imag == 0).all() else z
 
     return z
+
+
+def check_array(arry, msg="Can't convert input to numpy.ndarray"):
+    """check whether the input is a numpy array, and try to convert it
+
+    Args:
+        arry: the data to be checked
+        msg: the message to be passed to error instance
+
+    Returns:
+        arry as a numpy.ndarray
+
+    Raise:
+        TypeError, if it fail to convert the input to a numpy array
+    """
+
+    if isinstance(arry, (numbers.Number, numpy.number)):
+        return numpy.array([arry])
+    elif isinstance(arry, list):
+        return numpy.array(arry)
+    elif isinstance(arry, numpy.ndarray):
+        return arry
+    else:
+        raise TypeError(msg)

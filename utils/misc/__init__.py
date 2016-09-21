@@ -11,6 +11,7 @@
 from utils.misc.misc import factorial
 from utils.misc.misc import gamma
 from utils.misc.misc import strip_trivial
+from utils.misc.misc import check_array
 
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"
