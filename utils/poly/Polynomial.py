@@ -33,6 +33,7 @@ class Polynomial(object):
         defined: a boolean indicating whether the polynomial is defined
         roots: the roots of the polynomial
     """
+    # TODO: use better way to distinguish scalar, array, list
 
     def __init__(self, coeffs=None, roots=None, leading=1):
         """__init__
