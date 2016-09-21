@@ -12,6 +12,7 @@ from utils.poly.Polynomial import Polynomial
 from utils.poly.Jacobi import Jacobi
 from utils.poly.Legendre import Legendre
 from utils.poly.LagrangeBasis import LagrangeBasis
+from utils.poly.Lagrange import Lagrange
 
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"
