@@ -81,6 +81,8 @@ def find_roots(C, z=None):
     Returns:
         roots
     """
+    # TODO: handle multiple roots
+
     check_C(C)
 
     if C.size == 1:
@@ -108,7 +110,8 @@ def find_roots(C, z=None):
                 (numpy.prod(z[i]-z[:i]) * numpy.prod(z[i]-z[i+1:]))
             z[i] -= delta
 
-            if numpy.abs(delta) < 1e-14:
+            if numpy.abs(delta) < 1e-14 or \
+                    numpy.abs(eval_poly_coeffs(z[i], C)) < 1e-14:
                 stop[i] = True
 
         N += 1
