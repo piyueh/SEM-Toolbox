@@ -216,6 +216,7 @@ def mul_poly(C1, C2):
             nC[i:i+C2.size] += c * C2
 
     nC = strip_trivial(nC)
+    nC = numpy.append(nC[0], numpy.trim_zeros(strip_trivial(nC[1:]), 'b'))
 
     return nC
 
