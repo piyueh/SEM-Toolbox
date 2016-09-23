@@ -71,22 +71,31 @@ def jacobi_coef(n, alpha, beta):
         return numpy.array([0.5*(alpha-beta), 0.5*(alpha+beta+2.)],
                            dtype=numpy.float64)
     else:
-        n -= 1
+
+        C = numpy.array([None]*(n+1), dtype=numpy.ndarray)
+        C[0] = jacobi_coef(0, alpha, beta)
+        C[1] = jacobi_coef(1, alpha, beta)
 
         c1 = alpha + beta
-        np1 = n + 1
-        nt2 = 2 * n
-        np1t2 = 2 * np1
-        nt2p1 = nt2 + 1
 
-        a1 = np1t2 * (np1 + c1) * (nt2 + c1)
-        a2 = (nt2p1 + c1) * c1 * (alpha - beta)
-        a3 = (nt2 + c1) * (nt2p1 + c1) * (np1t2 + c1)
-        a4 = 2 * (n + alpha) * (n + beta) * (np1t2 + c1)
+        for i in range(2, n+1):
+            ni = i - 1
 
-        return (a3 * numpy.append([0.], jacobi_coef(n, alpha, beta)) +
-                a2 * numpy.append(jacobi_coef(n, alpha, beta), [0.]) -
-                a4 * numpy.append(jacobi_coef(n-1, alpha, beta), [0., 0.])) / a1
+            np1 = ni + 1
+            nt2 = 2 * ni
+            np1t2 = 2 * np1
+            nt2p1 = nt2 + 1
+
+            a1 = np1t2 * (np1 + c1) * (nt2 + c1)
+            a2 = (nt2p1 + c1) * c1 * (alpha - beta)
+            a3 = (nt2 + c1) * (nt2p1 + c1) * (np1t2 + c1)
+            a4 = 2 * (ni + alpha) * (ni + beta) * (np1t2 + c1)
+
+            C[i] = (a3 * numpy.append([0.], C[ni]) +
+                    a2 * numpy.append(C[ni], [0.]) -
+                    a4 * numpy.append(C[ni-1], [0., 0.])) / a1
+
+        return C[-1]
 
 
 def jacobi_r_d1(x, n, alpha, beta):
