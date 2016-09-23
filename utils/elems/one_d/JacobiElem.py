@@ -6,37 +6,46 @@
 #
 # Distributed under terms of the MIT license.
 
-"""Definition of element using Jacobi polynomials as expansions"""
+"""Definition of standard element of p-type Jacobi polynomials expansions"""
 
 import numpy
 from utils.poly import Polynomial
 from utils.poly import Jacobi
-from utils.quadrature import GaussLobattoJacobi
 
 
 class JacobiElem:
 
-    def __init__(self, nIdx_g, P, alpha, beta, Q=10):
+    def __init__(self, nIdx_g, n, alpha, beta):
+        """__init__
 
-        # TODO: check whether nIdx_g is a list or an array
-        # TODO: check whether P, alpha, beta, Q are integers
-        # TODO: check whether P >= 1
-        # TODO: check whether len(nIdx_g) == P + 1
+        Args:
+            nIdx_g: array of the global indicies of the nodes in this element
+            n: number of nodes in this element
+            alpha: the alpha used for Jacobi polynomial
+            beta: the beta used for Jacobi polynomial
+        """
 
-        self.p_order = P
-        self.n_nodes = self.p_order + 1
+        assert isinstance(nIdx_g, (numpy.ndarray, list)), \
+            "nIdx_g is neither a numpy array nor a list"
+        assert isinstance(n, (int, numpy.int_)), \
+            "the number of nodes, n, is not an integer"
+        assert n >= 2, \
+            "the number of nodes, n, should be >= 2"
+        assert n == len(nIdx_g), \
+            "the lenth of nIdx_g is not the same as n"
+
+        self.nIdx_g = numpy.array(nIdx_g)
+
+        self.p_order = n - 1
+        self.n_nodes = n
         self.alpha = alpha
         self.beta = beta
-
-        self.Q = Q
-        self.quad = GaussLobattoJacobi(self.Q)
-
-        self.nIdx_g = nIdx_g
 
         self._set_expn()
         self._set_mass_mtx()
 
     def _set_expn(self):
+        """set up expansion polynomials"""
 
         self.expn = numpy.array([None]*(self.n_nodes), dtype=Polynomial)
 
@@ -44,18 +53,22 @@ class JacobiElem:
         self.expn[-1] = Polynomial([0.5, 0.5])
 
         for i in range(1, self.p_order):
-            self.expn[i] = \
-                Polynomial(roots=[1, -1], leading=0.25) * \
-                Jacobi(i-1, self.alpha, self.beta)
+            self.expn[i] = Jacobi(i-1, self.alpha, self.beta) * \
+                Polynomial(roots=[1, -1], leading=0.25)
 
     def _set_mass_mtx(self):
+        """set up the mass matrix"""
 
         self.M = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
 
         for i in range(self.n_nodes):
             for j in range(self.n_nodes):
-                self.M[i, j] = self.quad(self.expn[i] * self.expn[j])
-                '''
-                if numpy.abs(self.M[i, j]) <= 1e-12:
+                print(i, j)
+                p = self.expn[i] * self.expn[j]
+                pi = p.integral()
+                self.M[i, j] = pi(1) - pi(-1)
+
+                # TODO: this is silly... find analytical solutions to build this
+                #       "sparse" matrix!!
+                if numpy.abs(self.M[i, j]) <= 1e-14:
                     self.M[i, j] = 0
-                '''
