@@ -1,4 +1,4 @@
 Package elem
 ============
 
-Classes for different elements.
+Classes for different standard elements.
