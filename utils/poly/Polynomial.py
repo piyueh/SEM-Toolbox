@@ -87,7 +87,7 @@ class Polynomial(object):
         s = "{0}".format(self.coeffs[0])
         for i, c in enumerate(self.coeffs[1:]):
             s += " + "
-            s += "{0} x^{1}".format(c, i)
+            s += "{0} x^{1}".format(c, i+1)
 
         return s
 
