@@ -11,6 +11,7 @@
 import numpy
 from utils.poly.Polynomial import Polynomial
 from utils.poly.jacobi_operations import jacobi_coef
+from utils.poly.poly_operations import find_roots
 
 
 class Jacobi(Polynomial):
@@ -35,14 +36,23 @@ class Jacobi(Polynomial):
         self.alpha = _alpha
         self.beta = _beta
 
-        assert self.roots.dtype == numpy.float64, \
-            "The roots of a Jacobi polynomial should be real numbers. " +\
-            "Please check the source code of polynomial operations."
+        if self.n > 0:
+            assert self.roots.dtype == numpy.float64, \
+                "The roots of a Jacobi polynomial should be real numbers. " +\
+                "Please check the source code of polynomial operations."
 
-        self.roots = numpy.sort(self.roots)
+            self.roots = numpy.sort(self.roots)
 
     def __repr__(self):
         """__repr__"""
 
         return "{0}({1}, {2}, {3})".format(
             self.__class__, self.n, self.alpha, self.beta)
+
+    def _find_roots(self):
+        """calculate the roots and store them in self.root"""
+
+        self.roots = numpy.array(
+            [-numpy.cos((2*i+1)*numpy.pi/(2*self.n)) for i in range(self.n)])
+
+        self.roots = find_roots(self.coeffs)
