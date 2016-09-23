@@ -51,7 +51,7 @@ def eval_poly_roots(x, R, leading=1):
 
 
 def der_poly(C):
-    """der_poly
+    """derivative of a polynomial
 
     Args:
         C: coefficient array
@@ -64,11 +64,27 @@ def der_poly(C):
     if C.size == 1:
         return numpy.zeros(1)
 
-    dC = numpy.zeros(C.size - 1)
-    for i, c in enumerate(C[1:]):
-        dC[i] = c * (i + 1)
+    dC = C[1:] * numpy.arange(1, C.size)
 
     return dC
+
+
+def int_poly(C, C0=0):
+    """undeterministic integral of a polynomial
+
+    Args:
+        C: the coefficient array of the polynomial
+        C0: the constant term generated from integration, default 0
+
+    Returns:
+        the integrated polynomial with constant term C0 (dafault 0)
+    """
+
+    check_C(C)
+
+    C = numpy.append([C0], C / numpy.arange(1, C.size+1))
+
+    return C
 
 
 def find_roots(C, z=None):

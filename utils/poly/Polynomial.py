@@ -10,7 +10,7 @@
 
 import numpy
 from utils.poly.poly_operations import eval_poly_coeffs, eval_poly_roots
-from utils.poly.poly_operations import der_poly
+from utils.poly.poly_operations import der_poly, int_poly
 from utils.poly.poly_operations import find_roots, find_coeffs
 from utils.poly.poly_operations import add_polys, mul_poly, div_poly
 
@@ -220,6 +220,15 @@ class Polynomial(object):
         self._eval = lambda x: eval_poly_roots(x, self.roots, self.coeffs[-1])
 
     def derive(self, o=1):
+        """return a polynomial of derivative
+
+        Args:
+            o: the order of derivatives
+
+        Returns:
+            a Polynomial instance
+        """
+
         assert o >= 1, "The order of derivative should >= 1"
         assert o <= (self.n + 1), "The order of derivative should <= n+1"
 
@@ -227,4 +236,16 @@ class Polynomial(object):
             return Polynomial(der_poly(self.coeffs))
         else:
             return Polynomial(der_poly(self.coeffs)).derive(o-1)
-    # TODO add different method to return derivative
+        # TODO add different method to return derivative
+
+    def integral(self, C0=0):
+        """return a polynomial of undeterministic integratl
+
+        Args:
+            C0: the constant term generated during integral
+
+        Returns:
+            a Polynomial instance
+        """
+
+        return Polynomial(int_poly(self.coeffs, C0))
