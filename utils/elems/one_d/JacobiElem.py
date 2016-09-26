@@ -14,15 +14,29 @@ from utils.poly import Jacobi
 
 
 class JacobiElem:
+    """General class for p-type modal expansion using Jacobi polynomial
 
-    def __init__(self, nIdx_g, n, alpha, beta):
+    For this element, the boundary and interior modes are
+
+    i = 0, phi(x) = (1-x) / 2
+    i = 1 to n-2, phi(x) = (1-x)(1+x)J(i-1, alpha, beta)/4
+    i = n-1, phi(x) = (1+x)/2
+
+    The construction of mass matrix is done by direct polynomial integration. So
+    it's likely return very small floating numbers that are supposed to be
+    zeros. Therefore, for common type of Jacobi polynomials, such as alpha=beta=
+    0, 1, 2, it's better to use specialized class.
+    """
+
+    def __init__(self, nIdx_g, n, alpha, beta, tol=1e-12):
         """__init__
 
         Args:
             nIdx_g: array of the global indicies of the nodes in this element
-            n: number of nodes in this element
+            n: number of modes in this element
             alpha: the alpha used for Jacobi polynomial
             beta: the beta used for Jacobi polynomial
+            tol: tolerance for entities in mass matrix to be treat as zeros
         """
 
         assert isinstance(nIdx_g, (numpy.ndarray, list)), \
@@ -42,7 +56,7 @@ class JacobiElem:
         self.beta = beta
 
         self._set_expn()
-        self._set_mass_mtx()
+        self._set_mass_mtx(tol)
 
     def _set_expn(self):
         """set up expansion polynomials"""
@@ -56,19 +70,15 @@ class JacobiElem:
             self.expn[i] = Jacobi(i-1, self.alpha, self.beta) * \
                 Polynomial(roots=[1, -1], leading=0.25)
 
-    def _set_mass_mtx(self):
+    def _set_mass_mtx(self, tol=1e-12):
         """set up the mass matrix"""
 
         self.M = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
 
         for i in range(self.n_nodes):
             for j in range(self.n_nodes):
-                print(i, j)
-                p = self.expn[i] * self.expn[j]
-                pi = p.integral()
-                self.M[i, j] = pi(1) - pi(-1)
+                p = (self.expn[i] * self.expn[j]).integral()
+                self.M[i, j] = p(1) - p(-1)
 
-                # TODO: this is silly... find analytical solutions to build this
-                #       "sparse" matrix!!
-                if numpy.abs(self.M[i, j]) <= 1e-14:
-                    self.M[i, j] = 0
+        Mmax = numpy.max(self.M)
+        self.M = numpy.where(numpy.abs(self.M/Mmax) <= tol, 0, self.M)
