@@ -68,7 +68,7 @@ class JacobiElem:
 
         for i in range(1, self.p_order):
             self.expn[i] = Jacobi(i-1, self.alpha, self.beta) * \
-                Polynomial(roots=[1, -1], leading=0.25)
+                Polynomial(roots=[1, -1], leading=-0.25)
 
     def _set_mass_mtx(self, tol=1e-12):
         """set up the mass matrix"""
