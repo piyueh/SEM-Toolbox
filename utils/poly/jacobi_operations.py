@@ -217,6 +217,28 @@ def jacobi_weights(roots, n, alpha, beta):
     return ans
 
 
+def jacobi_orthgonal_constant(n, alpha, beta):
+    """return the coefficient of orthogonal integral of Jacobi polynomial
+
+    Args:
+        n: order of the Jacobi polynomial
+        alpha, beta: parameters of JAcobi polynomials
+
+    Returns:
+        the result of orthogonal integral
+    """
+
+    jacobi_check(n, alpha, beta)
+
+    apb = alpha + beta
+    ap1 = alpha + 1
+    bp1 = beta + 1
+    ans = (numpy.power(2, apb + 1) * gamma(ap1 + n) * gamma(bp1 + n))
+    ans /= (factorial(n) * gamma(n + apb + 1) * (2 * n + apb + 1))
+
+    return ans
+
+
 def jacobi_check(n, alpha, beta):
     """Check the parameters used in Jacobi polynomials
 
@@ -229,8 +251,8 @@ def jacobi_check(n, alpha, beta):
     Raises:
         None
     """
-    assert alpha >= -1, "alpha should be larger than/equal to -1"
-    assert beta >= -1, "beta should be larger than/equal to -1"
+    assert alpha > -1, "alpha should be larger than/equal to -1"
+    assert beta > -1, "beta should be larger than/equal to -1"
     assert n >= 0, "n should be larger than/equal to 1"
 
 
