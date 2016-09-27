@@ -21,15 +21,15 @@ class CommonJacobiElem(JacobiElem):
     to keep globally C0 continuity.
     """
 
-    def __init__(self, nIdx_g, n):
+    def __init__(self, ends, n):
         """__init__
 
         Args:
-            nIdx_g: array of the global indicies of the nodes in this element
+            ends: array of the two end nodes (their locations)
             n: number of nodes in this element
         """
 
-        super().__init__(nIdx_g, n, 1, 1)
+        super().__init__(ends, n, 1, 1)
 
     def _set_mass_mtx(self, tol):
         """set up the mass matrix"""
@@ -41,15 +41,17 @@ class CommonJacobiElem(JacobiElem):
         self.M[0, -1] = self.M[-1, 0] = 1. / 3.
         self.M[-1, -1] = 2. / 3.
 
-        self.M[0, 1] = self.M[1, 0] = \
-            jacobi_orthogonal_constant(0, 1, 1) / 8.
-        self.M[0, 2] = self.M[2, 0] = \
-            - jacobi_orthogonal_constant(1, 1, 1) / 16.
+        if self.n_nodes > 2:
+            self.M[0, 1] = self.M[1, 0] = \
+                jacobi_orthogonal_constant(0, 1, 1) / 8.
+            self.M[1, -1] = self.M[-1, 1] = \
+                jacobi_orthogonal_constant(0, 1, 1) / 8.
 
-        self.M[1, -1] = self.M[-1, 1] = \
-            jacobi_orthogonal_constant(0, 1, 1) / 8.
-        self.M[2, -1] = self.M[-1, 2] = \
-            jacobi_orthogonal_constant(1, 1, 1) / 16.
+        if self.n_nodes > 3:
+            self.M[0, 2] = self.M[2, 0] = \
+                - jacobi_orthogonal_constant(1, 1, 1) / 16.
+            self.M[2, -1] = self.M[-1, 2] = \
+                jacobi_orthogonal_constant(1, 1, 1) / 16.
 
         # 2nd step: handle interior modes
         for i, p in enumerate(self.expn[1:-1]):

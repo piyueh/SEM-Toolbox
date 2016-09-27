@@ -20,15 +20,15 @@ class LegendreElem(JacobiElem):
     and (1 + x) / 2 for boundary modes in order to keep globally C0 continuity.
     """
 
-    def __init__(self, nIdx_g, n):
+    def __init__(self, ends, n):
         """__init__
 
         Args:
-            nIdx_g: array of the global indicies of the nodes in this element
+            ends: array of the two end nodes (their locations)
             n: number of nodes in this element
         """
 
-        super().__init__(nIdx_g, n, 0, 0)
+        super().__init__(ends, n, 0, 0)
 
     def _set_mass_mtx(self, tol):
         """set up the mass matrix"""
@@ -40,23 +40,29 @@ class LegendreElem(JacobiElem):
         self.M[0, -1] = self.M[-1, 0] = 1. / 3.
         self.M[-1, -1] = 2. / 3.
 
-        self.M[0, 1] = self.M[1, 0] = \
-            jacobi_orthogonal_constant(0, 0, 0) / 12.
-        self.M[0, 2] = self.M[2, 0] = \
-            - jacobi_orthogonal_constant(1, 0, 0) / 20.
-        self.M[0, 3] = self.M[3, 0] = \
-            - jacobi_orthogonal_constant(2, 0, 0) / 12.
-        self.M[0, 4] = self.M[4, 0] = \
-            jacobi_orthogonal_constant(3, 0, 0) / 20.
+        if self.n_nodes > 2:
+            self.M[0, 1] = self.M[1, 0] = \
+                jacobi_orthogonal_constant(0, 0, 0) / 12.
+            self.M[1, -1] = self.M[-1, 1] = \
+                jacobi_orthogonal_constant(0, 0, 0) / 12.
 
-        self.M[1, -1] = self.M[-1, 1] = \
-            jacobi_orthogonal_constant(0, 0, 0) / 12.
-        self.M[2, -1] = self.M[-1, 2] = \
-            jacobi_orthogonal_constant(1, 0, 0) / 20.
-        self.M[3, -1] = self.M[-1, 3] = \
-            - jacobi_orthogonal_constant(2, 0, 0) / 12.
-        self.M[4, -1] = self.M[-1, 4] = \
-            - jacobi_orthogonal_constant(3, 0, 0) / 20.
+        if self.n_nodes > 3:
+            self.M[0, 2] = self.M[2, 0] = \
+                - jacobi_orthogonal_constant(1, 0, 0) / 20.
+            self.M[2, -1] = self.M[-1, 2] = \
+                jacobi_orthogonal_constant(1, 0, 0) / 20.
+
+        if self.n_nodes > 4:
+            self.M[0, 3] = self.M[3, 0] = \
+                - jacobi_orthogonal_constant(2, 0, 0) / 12.
+            self.M[3, -1] = self.M[-1, 3] = \
+                - jacobi_orthogonal_constant(2, 0, 0) / 12.
+
+        if self.n_nodes > 5:
+            self.M[0, 4] = self.M[4, 0] = \
+                jacobi_orthogonal_constant(3, 0, 0) / 20.
+            self.M[4, -1] = self.M[-1, 4] = \
+                - jacobi_orthogonal_constant(3, 0, 0) / 20.
 
         # 2nd step: handle interior modes
         for i, p in enumerate(self.expn[1:-1]):

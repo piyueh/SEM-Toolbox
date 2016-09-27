@@ -28,27 +28,28 @@ class JacobiElem:
     0, 1, 2, it's better to use specialized class.
     """
 
-    def __init__(self, nIdx_g, n, alpha, beta, tol=1e-12):
+    def __init__(self, ends, n, alpha, beta, tol=1e-12):
         """__init__
 
         Args:
-            nIdx_g: array of the global indicies of the nodes in this element
+            ends: array of the two end nodes (their locations)
             n: number of modes in this element
             alpha: the alpha used for Jacobi polynomial
             beta: the beta used for Jacobi polynomial
             tol: tolerance for entities in mass matrix to be treat as zeros
         """
 
-        assert isinstance(nIdx_g, (numpy.ndarray, list)), \
-            "nIdx_g is neither a numpy array nor a list"
+        assert isinstance(ends, (numpy.ndarray, list)), \
+            "ends is neither a numpy array nor a list"
+        assert len(ends) == 2, \
+            "the size of end nodes array should be two"
         assert isinstance(n, (int, numpy.int_)), \
             "the number of nodes, n, is not an integer"
         assert n >= 2, \
             "the number of nodes, n, should be >= 2"
-        assert n == len(nIdx_g), \
-            "the lenth of nIdx_g is not the same as n"
 
-        self.nIdx_g = numpy.array(nIdx_g)
+        self.ends = numpy.array(ends, dtype=numpy.float64)
+        self.L = numpy.abs(ends[1] - ends[0])
 
         self.p_order = n - 1
         self.n_nodes = n
