@@ -37,26 +37,29 @@ class LegendreElem(JacobiElem):
 
         # 1st step: handle boundary modes
         self.M[0, 0] = 2. / 3.
-        self.M[0, -1] = 1. / 3.
+        self.M[0, -1] = self.M[-1, 0] = 1. / 3.
         self.M[-1, -1] = 2. / 3.
 
-        self.M[0, 1] = jacobi_orthogonal_constant(0, 0, 0) / 12.
-        self.M[0, 2] = - jacobi_orthogonal_constant(1, 0, 0) / 20.
-        self.M[0, 3] = - jacobi_orthogonal_constant(2, 0, 0) / 12.
-        self.M[0, 4] = jacobi_orthogonal_constant(3, 0, 0) / 20.
+        self.M[0, 1] = self.M[1, 0] = \
+            jacobi_orthogonal_constant(0, 0, 0) / 12.
+        self.M[0, 2] = self.M[2, 0] = \
+            - jacobi_orthogonal_constant(1, 0, 0) / 20.
+        self.M[0, 3] = self.M[3, 0] = \
+            - jacobi_orthogonal_constant(2, 0, 0) / 12.
+        self.M[0, 4] = self.M[4, 0] = \
+            jacobi_orthogonal_constant(3, 0, 0) / 20.
 
-        self.M[1, -1] = jacobi_orthogonal_constant(0, 0, 0) / 12.
-        self.M[2, -1] = jacobi_orthogonal_constant(1, 0, 0) / 20.
-        self.M[3, -1] = - jacobi_orthogonal_constant(2, 0, 0) / 12.
-        self.M[4, -1] = - jacobi_orthogonal_constant(3, 0, 0) / 20.
+        self.M[1, -1] = self.M[-1, 1] = \
+            jacobi_orthogonal_constant(0, 0, 0) / 12.
+        self.M[2, -1] = self.M[-1, 2] = \
+            jacobi_orthogonal_constant(1, 0, 0) / 20.
+        self.M[3, -1] = self.M[-1, 3] = \
+            - jacobi_orthogonal_constant(2, 0, 0) / 12.
+        self.M[4, -1] = self.M[-1, 4] = \
+            - jacobi_orthogonal_constant(3, 0, 0) / 20.
 
         # 2nd step: handle interior modes
         for i, p in enumerate(self.expn[1:-1]):
             for j in range(i+1, min(self.n_nodes-1, i+4+2), 2):
                 pi = (p * self.expn[j]).integral()
-                self.M[i+1, j] = pi(1) - pi(-1)
-
-        # 3rd step: symmetric
-        for i in range(1, self.n_nodes):
-            for j in range(0, i):
-                self.M[i, j] = self.M[j, i]
+                self.M[i+1, j] = self.M[j, i+1] = pi(1) - pi(-1)
