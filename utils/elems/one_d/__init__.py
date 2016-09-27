@@ -9,6 +9,7 @@
 """__init__.py for subpackage elems.1d"""
 
 from utils.elems.one_d.JacobiElem import JacobiElem
+from utils.elems.one_d.LegendreElem import LegendreElem
 
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"

@@ -217,7 +217,7 @@ def jacobi_weights(roots, n, alpha, beta):
     return ans
 
 
-def jacobi_orthgonal_constant(n, alpha, beta):
+def jacobi_orthogonal_constant(n, alpha, beta):
     """return the coefficient of orthogonal integral of Jacobi polynomial
 
     Args:
