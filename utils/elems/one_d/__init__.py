@@ -10,6 +10,7 @@
 
 from utils.elems.one_d.JacobiElem import JacobiElem
 from utils.elems.one_d.LegendreElem import LegendreElem
+from utils.elems.one_d.CommonJacobiElem import CommonJacobiElem
 
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"
