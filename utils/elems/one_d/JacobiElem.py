@@ -11,9 +11,10 @@
 import numpy
 from utils.poly import Polynomial
 from utils.poly import Jacobi
+from utils.elems.one_d.BaseElem import BaseElem
 
 
-class JacobiElem:
+class JacobiElem(BaseElem):
     """General class for p-type modal expansion using Jacobi polynomial
 
     For this element, the boundary and interior modes are
@@ -39,25 +40,11 @@ class JacobiElem:
             tol: tolerance for entities in mass matrix to be treat as zeros
         """
 
-        assert isinstance(ends, (numpy.ndarray, list)), \
-            "ends is neither a numpy array nor a list"
-        assert len(ends) == 2, \
-            "the size of end nodes array should be two"
-        assert isinstance(n, (int, numpy.int_)), \
-            "the number of nodes, n, is not an integer"
-        assert n >= 2, \
-            "the number of nodes, n, should be >= 2"
-
-        self.ends = numpy.array(ends, dtype=numpy.float64)
-        self.L = numpy.abs(ends[1] - ends[0])
-
         self.p_order = n - 1
-        self.n_nodes = n
         self.alpha = alpha
         self.beta = beta
 
-        self._set_expn()
-        self._set_mass_mtx(tol)
+        super().__init__(ends, n, tol)
 
     def _set_expn(self):
         """set up expansion polynomials"""
