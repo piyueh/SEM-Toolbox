@@ -18,3 +18,12 @@ from utils.elems.one_d.PureLegendreElem import PureLegendreElem
 
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"
+__expns__ = {
+    "Moment": MomentElem,
+    "Lagrange": LagrangeElem,
+    "PureLegendre": PureLegendreElem,
+    "Jacobi": JacobiElem,
+    "Legendre": LegendreElem,
+    "CommonJacobi": CommonJacobiElem,
+    "GaussLobattoJacobi": GaussLobattoJacobiElem
+}
