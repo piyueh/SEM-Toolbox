@@ -6,14 +6,14 @@
 #
 # Distributed under terms of the MIT license.
 
-"""Order the nodes or modes sequentially"""
+"""Base class of all 1D global assembly"""
 
 import numpy
 import utils.elems.one_d as elem
 
 
-class BasicAssembly(object):
-    """A class representing global assembly in 1D domain using basic ordering"""
+class BaseAssembly(object):
+    """Base class of all 1D global assembly"""
 
     def __init__(self, nElems, ends, expn, P, endNodes=None):
         """__init__ initialize the class
@@ -140,7 +140,7 @@ class BasicAssembly(object):
         """
 
         self.nModes = self.P.sum() + 1
-        self.coeffs = numpy.zeros(self.nModes, dtype=numpy.float64)
+        self.coeffs = None
 
     def _set_mapping(self):
         """_set_mapping sets up local to global index dict
@@ -151,15 +151,7 @@ class BasicAssembly(object):
                 3rd node/mode in the 0th element.
         """
 
-        self.l2g = numpy.empty(self.nElems, dtype=numpy.ndarray)
-
-        self.l2g[0] = numpy.arange(0, self.elems[0].n_nodes)
-        cnt = self.elems[0].n_nodes - 1
-        for i, e in enumerate(self.elems[1:]):
-            self.l2g[i+1] = numpy.arange(cnt, cnt+e.n_nodes)
-            cnt += (e.n_nodes - 1)
-
-        assert cnt == self.nModes - 1
+        pass
 
     def _set_global_mass_mtx(self):
         """_set_global_mass_mtx sets up the global mass matrix
@@ -175,3 +167,73 @@ class BasicAssembly(object):
         for i, e in enumerate(self.elems):
             i, j = numpy.meshgrid(self.l2g[i], self.l2g[i])
             self.M[j, i] += e.M
+
+    def set_coeffs(self, coeffs):
+        """set_coeffs sets up the coefficients after solving
+
+        Args:
+            coeffs: a list/ndarray of the coefficients
+
+        Results:
+            self.coeffs: a list/ndarray of the coefficients
+        """
+        # TODO: check the length and type of coeffs
+
+        self.coeffs = numpy.array(coeffs, dtype=numpy.float64)
+
+        for i in range(self.nElems):
+            self.elems[i].set_ui(self.coeffs[self.l2g[i]])
+
+    def __call__(self, x):
+        """__call__ calculate values at locations x
+
+        Args:
+            x: a single floating number or a list/ndarray of floating numbers.
+                x represents locations at where the values will be calculated.
+
+        Returns:
+            values
+        """
+
+        if self.coeffs is not None:
+            try:
+                return numpy.array(
+                    [self._call_single(xi) for i, xi in enumerate(x)],
+                    dtype=numpy.float64)
+            except TypeError:
+                try:
+                    return self._call_single(x)
+                except:
+                    raise
+            except:
+                raise
+        else:
+            raise ValueError("the coeffs has not been set")
+
+    def _call_single(self, x):
+        """_call_single calculate the value at location x
+
+        Args:
+            x: the location of the value at where to be calculated
+
+        Returns: the value
+        """
+        # TODO: check the type of x
+        i = numpy.searchsorted(self.endNodes, x) - 1
+        return self.elems[i](x)
+
+    def __str__(self):
+        """__str__"""
+
+        s = "Dimension: 1\n"
+        s += "Ordering: baisc (sequential)\n"
+        s += "Number of elements: {0}\n".format(self.nElems)
+        s += "Coefficients are known: {0}\n".format(self.coeffs is not None)
+
+        return s
+
+    def __repr__(self):
+        """__repr__"""
+
+        return "{0}({1}, {2}, {3}, {4})".format(self.__class__, self.nElems,
+                                                self.ends, self.expns, self.P)

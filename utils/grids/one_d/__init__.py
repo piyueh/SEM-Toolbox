@@ -8,5 +8,7 @@
 
 """__init__.py for package global/one_d"""
 
+from utils.grids.one_d.SequentialAssembly import SequentialAssembly
+
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"
