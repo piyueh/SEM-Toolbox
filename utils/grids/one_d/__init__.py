@@ -9,6 +9,7 @@
 """__init__.py for package global/one_d"""
 
 from utils.grids.one_d.SequentialAssembly import SequentialAssembly
+from utils.grids.one_d.DecomposeAssembly import DecomposeAssembly
 
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"
