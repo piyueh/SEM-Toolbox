@@ -219,6 +219,16 @@ class BaseAssembly(object):
         Returns: the value
         """
         # TODO: check the type of x
+
+        if x < self.ends[0] or x > self.ends[1]:
+            raise ValueError(
+                "the input location is outside the domain. " +
+                "The input is {0}, where the domain is ".format(x) +
+                "[{0}, {1}].".format(self.ends[0], self.ends[1]))
+
+        if x == self.ends[0]:
+            return self.elems[0](x)
+
         i = numpy.searchsorted(self.endNodes, x) - 1
         return self.elems[i](x)
 
