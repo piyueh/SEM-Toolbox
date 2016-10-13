@@ -24,7 +24,8 @@ def factorial(n):
         n!
     """
 
-    assert isinstance(n, int), "input is not an integer"
+    assert isinstance(n, (int, numpy.int_)), \
+        "input is not an integer: {0}, {1}".format(n, type(n))
     if n == 0:
         return 1
     else:
