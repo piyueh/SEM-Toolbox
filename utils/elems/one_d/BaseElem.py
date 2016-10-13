@@ -43,6 +43,7 @@ class BaseElem:
 
         self._set_expn()
         self._set_mass_mtx(tol)
+        self._set_weak_laplacian(tol)
 
     def __call__(self, x):
         """__call__
@@ -66,6 +67,11 @@ class BaseElem:
         """compute mass matrix"""
 
         self.M = None
+
+    def _set_weak_laplacian(self, tol=1e-12):
+        """compute weak-form laplacian"""
+
+        self.wL = None
 
     def x_to_xi(self, x):
         """map physical coordinate x to standard coordinate xi

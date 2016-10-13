@@ -70,3 +70,16 @@ class JacobiElem(BaseElem):
 
         Mmax = numpy.max(self.M)
         self.M = numpy.where(numpy.abs(self.M/Mmax) <= tol, 0, self.M)
+
+    def _set_weak_laplacian(self, tol=1e-12):
+        """set up the mass matrix"""
+
+        self.wL = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
+
+        for i in range(self.n_nodes):
+            for j in range(self.n_nodes):
+                p = (self.expn[i].derive() * self.expn[j].derive()).integral()
+                self.wL[i, j] = p(1) - p(-1)
+
+        wLmax = numpy.max(self.wL)
+        self.wL = numpy.where(numpy.abs(self.wL/wLmax) <= tol, 0, self.wL)
