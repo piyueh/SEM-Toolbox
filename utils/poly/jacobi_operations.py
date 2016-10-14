@@ -11,6 +11,7 @@
 import numpy
 from utils.misc import gamma, factorial
 from utils.errors.InfLoopError import InfLoopError
+from utils.errors.JacobiOrderError import JacobiOrderError
 
 
 def jacobi_r(x, n, alpha, beta):
@@ -65,6 +66,8 @@ def jacobi_coef(n, alpha, beta):
     Returns:
         the coefficient array
     """
+    # TODO: use jacobi_recr_coeff to get a1~a4
+
     if n == 0:
         return numpy.array([1.], dtype=numpy.float64)
     elif n == 1:
@@ -127,6 +130,39 @@ def jacobi_r_d1(x, n, alpha, beta):
 
         return (b2 * jacobi_r(x, n, alpha, beta) +
                 b3 * jacobi_r(x, n - 1, alpha, beta)) / b1
+
+
+def jacobi_recr_coeffs(n, alpha, beta):
+    """calculate the coefficients used in recursion relationship
+
+    Args:
+        n: the targeting order
+        alpha: the alpha coefficient of Jacobi polynomial
+        beta: the veta coefficient of Jacobi polynomial
+
+    Returns:
+        a1, a2, a3, a4: the coefficients used in recursion relationship
+    """
+
+    jacobi_check(n, alpha, beta)
+
+    if n == 0:
+        a1 = 2
+        a2 = alpha - beta
+        a3 = alpha + beta + 2
+        a4 = 0
+    else:
+        n_p_a = n + alpha
+        n_p_b = n + beta
+        n_p_a_p_b = n_p_a + beta
+        n2_p_a_p_b = n_p_a + n_p_b
+
+        a1 = 2 * (n + 1) * (n_p_a_p_b + 1) * n2_p_a_p_b
+        a2 = (n2_p_a_p_b + 1) * (alpha + beta) * (alpha - beta)
+        a3 = n2_p_a_p_b * (n2_p_a_p_b + 1) * (n2_p_a_p_b + 2)
+        a4 = 2 * n_p_a * n_p_b * (n2_p_a_p_b + 2)
+
+    return a1, a2, a3, a4
 
 
 def jacobi_d1(x, n, alpha, beta):
@@ -227,14 +263,17 @@ def jacobi_orthogonal_constant(n, alpha, beta):
     Returns:
         the result of orthogonal integral
     """
+    # TODO: check overflow
 
     jacobi_check(n, alpha, beta)
 
     apb = alpha + beta
     ap1 = alpha + 1
     bp1 = beta + 1
-    ans = (numpy.power(2, apb + 1) * gamma(ap1 + n) * gamma(bp1 + n))
-    ans /= (factorial(n) * gamma(n + apb + 1) * (2 * n + apb + 1))
+    ans = numpy.power(2, apb + 1)
+    ans /= (2 * n + apb + 1)
+    ans *= (gamma(ap1 + n) / factorial(n))
+    ans /= (gamma(n + apb + 1) / gamma(bp1 + n))
 
     return ans
 
@@ -253,7 +292,9 @@ def jacobi_check(n, alpha, beta):
     """
     assert alpha > -1, "alpha should be larger than/equal to -1"
     assert beta > -1, "beta should be larger than/equal to -1"
-    assert n >= 0, "n should be larger than/equal to 1"
+
+    if (n < 0) or (not isinstance(n, (int, numpy.int))):
+        raise JacobiOrderError(n)
 
 
 def jacobi_roots_check(roots, n, alpha, beta):
