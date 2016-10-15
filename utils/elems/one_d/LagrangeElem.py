@@ -57,16 +57,3 @@ class LagrangeElem(BaseElem):
         for i in range(self.n_nodes):
             self.expn[i] = Polynomial(roots=numpy.delete(self.nodes, i))
             self.expn[i] /= self.expn[i](self.nodes[i])
-
-    def _set_mass_mtx(self, tol=1e-12):
-        """set up the mass matrix"""
-
-        self.M = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
-
-        for i in range(self.n_nodes):
-            for j in range(self.n_nodes):
-                p = (self.expn[i] * self.expn[j]).integral()
-                self.M[i, j] = p(1) - p(-1)
-
-        Mmax = numpy.max(self.M)
-        self.M = numpy.where(numpy.abs(self.M/Mmax) <= tol, 0, self.M)

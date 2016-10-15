@@ -66,12 +66,28 @@ class BaseElem:
     def _set_mass_mtx(self, tol=1e-12):
         """compute mass matrix"""
 
-        self.M = None
+        self.M = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
+
+        for i in range(self.n_nodes):
+            for j in range(self.n_nodes):
+                p = (self.expn[i] * self.expn[j]).integral()
+                self.M[i, j] = p(1) - p(-1)
+
+        Mmax = numpy.max(self.M)
+        self.M = numpy.where(numpy.abs(self.M/Mmax) <= tol, 0, self.M)
 
     def _set_weak_laplacian(self, tol=1e-12):
         """compute weak-form laplacian"""
 
-        self.wL = None
+        self.wL = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
+
+        for i in range(self.n_nodes):
+            for j in range(self.n_nodes):
+                p = (self.expn[i].derive() * self.expn[j].derive()).integral()
+                self.wL[i, j] = p(1) - p(-1)
+
+        wLmax = numpy.max(self.wL)
+        self.wL = numpy.where(numpy.abs(self.wL/wLmax) <= tol, 0, self.wL)
 
     def x_to_xi(self, x):
         """map physical coordinate x to standard coordinate xi
