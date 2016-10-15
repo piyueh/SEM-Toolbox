@@ -41,7 +41,12 @@ class GaussLobattoJacobiElem(LagrangeElem):
         super().__init__(ends, n, self.qd.nodes)
 
     def _set_mass_mtx(self, tol=1e-12):
-        """set up the mass matrix"""
+        """set up the mass matrix
+
+        Note:
+            the mass matrix is calculated through Gauss-Lobatto-Jacobi
+            quadrature, so the mass matrix is lumpped.
+        """
 
         self.M = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
 
