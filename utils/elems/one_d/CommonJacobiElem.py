@@ -58,3 +58,21 @@ class CommonJacobiElem(JacobiElem):
             for j in range(i+1, min(self.n_nodes-1, i+2+2), 2):
                 pi = (p * self.expn[j]).integral()
                 self.M[i+1, j] = self.M[j, i+1] = pi(1) - pi(-1)
+
+    def _set_weak_laplacian(self, tol=1e-12):
+        """set up the mass matrix"""
+
+        self.wL = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
+
+        # boundary-boundary
+        self.wL[0, 0] = self.wL[-1, -1] = 0.5
+        self.wL[0, -1] = self.wL[-1, 0] = -0.5
+
+        # boundary-interior
+        # all zeros
+
+        # interior-interior
+        # only diagonal entities are non-zeros
+        for i in range(1, self.n_nodes-1):
+            self.wL[i, i] = \
+                i * (i + 1) * jacobi_orthogonal_constant(i-1, 1, 1) / 16.
