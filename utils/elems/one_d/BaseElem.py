@@ -45,6 +45,7 @@ class BaseElem:
         self._set_expn()
         self._set_mass_mtx(tol)
         self._set_weak_laplacian(tol)
+        self._scale_weak_laplacian()
 
     def __call__(self, x):
         """__call__
@@ -89,6 +90,12 @@ class BaseElem:
 
         wLmax = numpy.max(self.wL)
         self.wL = numpy.where(numpy.abs(self.wL/wLmax) <= tol, 0, self.wL)
+
+    def _scale_weak_laplacian(self):
+        """_scale_weak_laplacian scales the weak Laplacian"""
+
+        self.wL *= 4
+        self.wL /= (self.L * self.L)
 
     def weak_rhs(self, f, Q=None):
         """weak_rhs calculates the weak RHS with given RHS function f
