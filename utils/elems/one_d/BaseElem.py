@@ -43,6 +43,7 @@ class BaseElem:
         self.ui = None
 
         self._set_expn()
+        self._set_derivative()
         self._set_mass_mtx(tol)
         self._set_weak_laplacian(tol)
         self._scale_weak_laplacian()
@@ -56,6 +57,44 @@ class BaseElem:
         Returns:
             values
         """
+
+        if self.ui is not None:
+            try:
+                return numpy.array(
+                    [self._call_single(xi) for i, xi in enumerate(x)],
+                    dtype=numpy.float64)
+            except TypeError:
+                try:
+                    return self._call_single(x)
+                except:
+                    raise
+            except:
+                raise
+        else:
+            raise ValueError("the coeffs has not been set")
+
+    def _call_single(self, x):
+        """__call__
+
+        Args:
+            x: the location to evaluate values
+
+        Returns:
+            values
+        """
+        # TODO: check the type of x
+
+        if x < self.ends[0] or x > self.ends[1]:
+            raise ValueError(
+                "the input location is outside the domain. " +
+                "The input is {0}, where the domain is ".format(x) +
+                "[{0}, {1}].".format(self.ends[0], self.ends[1]))
+
+        if x == self.ends[0]:
+            return self.ui[0]
+
+        if x == self.ends[-1]:
+            return self.ui[-1]
 
         return numpy.array([self.expn[i](self.x_to_xi(x)) * self.ui[i]
                             for i in range(self.n_nodes)]).sum(axis=0)
@@ -162,3 +201,52 @@ class BaseElem:
             "the lenth of ui is not the same as that of the modes"
 
         self.ui = numpy.array(ui, dtype=numpy.float64)
+
+    def derivative(self, x):
+        """calculate derivatives at locations x
+
+        Args:
+            x: the location to evaluate derivatives
+
+        Returns:
+            derivatives at x
+        """
+
+        if self.ui is not None:
+            try:
+                return numpy.array(
+                    [self._derivative_single(xi) for i, xi in enumerate(x)],
+                    dtype=numpy.float64)
+            except TypeError:
+                try:
+                    return self._derivative_single(x)
+                except:
+                    raise
+            except:
+                raise
+        else:
+            raise ValueError("the coeffs has not been set")
+
+    def _derivative_single(self, x):
+        """_derivative_single calculates the derivative at a single location x
+
+        Args:
+            x: the location at where the derivative to be calculated
+
+        Returns: the derivative
+        """
+        # TODO: check the type of x
+
+        if x < self.ends[0] or x > self.ends[1]:
+            raise ValueError(
+                "the input location is outside the domain. " +
+                "The input is {0}, where the domain is ".format(x) +
+                "[{0}, {1}].".format(self.ends[0], self.ends[1]))
+
+        return 2 * numpy.array([self.d_expn[i](self.x_to_xi(x)) * self.ui[i]
+                                for i in range(self.n_nodes)]).sum(0) / self.L
+
+    def _set_derivative(self):
+        """_set_derivative compute the derivatives of expansions"""
+
+        self.d_expn = numpy.array([e.derive() for e in self.expn])

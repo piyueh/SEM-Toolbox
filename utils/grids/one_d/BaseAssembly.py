@@ -244,6 +244,32 @@ class BaseAssembly(object):
         else:
             raise ValueError("the coeffs has not been set")
 
+    def derivative(self, x):
+        """__call__ calculate values at locations x
+
+        Args:
+            x: a single floating number or a list/ndarray of floating numbers.
+                x represents locations at where the values will be calculated.
+
+        Returns:
+            values
+        """
+
+        if self.coeffs is not None:
+            try:
+                return numpy.array(
+                    [self._derivative_single(xi) for i, xi in enumerate(x)],
+                    dtype=numpy.float64)
+            except TypeError:
+                try:
+                    return self._derivative_single(x)
+                except:
+                    raise
+            except:
+                raise
+        else:
+            raise ValueError("the coeffs has not been set")
+
     def _call_single(self, x):
         """_call_single calculate the value at location x
 
@@ -265,6 +291,29 @@ class BaseAssembly(object):
 
         i = numpy.searchsorted(self.endNodes, x) - 1
         return self.elems[i](x)
+
+    def _derivative_single(self, x):
+        """_derivative_single calculates the derivative at a single location x
+
+        Args:
+            x: the location at where the derivative to be calculated
+
+        Returns: the derivative
+        """
+        # TODO: check the type of x
+
+        if x < self.ends[0] or x > self.ends[1]:
+            raise ValueError(
+                "the input location is outside the domain. " +
+                "The input is {0}, where the domain is ".format(x) +
+                "[{0}, {1}].".format(self.ends[0], self.ends[1]))
+
+        if x == self.ends[0]:
+            i = 0
+        else:
+            i = numpy.searchsorted(self.endNodes, x) - 1
+
+        return self.elems[i].derivative(x)
 
     def __str__(self):
         """__str__"""
