@@ -10,9 +10,10 @@
 
 import numpy
 from utils.poly import Polynomial
+from utils.elems.one_d.BaseElem import BaseElem
 
 
-class MomentElem:
+class MomentElem(BaseElem):
     """General class for moment expansion
 
     That is,
@@ -21,32 +22,6 @@ class MomentElem:
 
     This expansion is just for test purpose.
     """
-
-    def __init__(self, ends, n, tol=1e-12):
-        """__init__
-
-        Args:
-            ends: array of the two end nodes (their locations)
-            n: number of modes in this element
-            tol: tolerance for entities in mass matrix to be treat as zeros
-        """
-
-        assert isinstance(ends, (numpy.ndarray, list)), \
-            "ends is neither a numpy array nor a list"
-        assert len(ends) == 2, \
-            "the size of end nodes array should be two"
-        assert isinstance(n, (int, numpy.int_)), \
-            "the number of nodes, n, is not an integer"
-        assert n >= 2, \
-            "the number of nodes, n, should be >= 2"
-
-        self.ends = numpy.array(ends, dtype=numpy.float64)
-        self.L = numpy.abs(ends[1] - ends[0])
-
-        self.n_nodes = n
-
-        self._set_expn()
-        self._set_mass_mtx(tol)
 
     def _set_expn(self):
         """set up expansion polynomials"""
@@ -64,8 +39,15 @@ class MomentElem:
 
         for i in range(self.n_nodes):
             for j in range(self.n_nodes):
-                p = (self.expn[i] * self.expn[j]).integral()
-                self.M[i, j] = p(1) - p(-1)
+                if (i + j + 1) % 2 != 0:
+                    self.M[i, j] = 2. / (i + j + 1)
 
-        Mmax = numpy.max(self.M)
-        self.M = numpy.where(numpy.abs(self.M/Mmax) <= tol, 0, self.M)
+    def _set_weak_laplacian(self, tol=1e-12):
+        """set up the weak laplacian"""
+
+        self.wL = numpy.matrix(numpy.zeros((self.n_nodes, self.n_nodes)))
+
+        for i in range(self.n_nodes):
+            for j in range(self.n_nodes):
+                if (i + j - 1) % 2 != 0:
+                    self.wL[i, j] = i * j * 2. / (i + j - 1)
