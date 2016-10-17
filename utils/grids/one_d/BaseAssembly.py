@@ -53,6 +53,7 @@ class BaseAssembly(object):
         self._set_miscs()
         self._set_mapping()
         self._set_global_mass_mtx()
+        self._set_global_weak_laplacian()
 
     def _set_P(self, P):
         """_set_P sets up the order of each element
@@ -167,6 +168,21 @@ class BaseAssembly(object):
         for i, e in enumerate(self.elems):
             i, j = numpy.meshgrid(self.l2g[i], self.l2g[i])
             self.M[j, i] += e.M
+
+    def _set_global_weak_laplacian(self):
+        """_set_global_weak_laplacian sets up global weak Laplacian
+
+        Results:
+            self.wL: a numpy matrix of the global mass matrix
+        """
+        # TODO: use sparse matrix in Scipy instead
+
+        self.wL = numpy.matrix(numpy.zeros((self.nModes, self.nModes)),
+                               dtype=numpy.float64)
+
+        for i, e in enumerate(self.elems):
+            i, j = numpy.meshgrid(self.l2g[i], self.l2g[i])
+            self.wL[j, i] += e.wL
 
     def set_coeffs(self, coeffs):
         """set_coeffs sets up the coefficients after solving
