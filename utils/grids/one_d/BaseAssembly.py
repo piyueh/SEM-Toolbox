@@ -152,7 +152,7 @@ class BaseAssembly(object):
                 3rd node/mode in the 0th element.
         """
 
-        pass
+        self.l2g = numpy.empty(self.nElems, dtype=numpy.ndarray)
 
     def _set_global_mass_mtx(self):
         """_set_global_mass_mtx sets up the global mass matrix
@@ -199,6 +199,24 @@ class BaseAssembly(object):
 
         for i in range(self.nElems):
             self.elems[i].set_ui(self.coeffs[self.l2g[i]])
+
+    def weak_rhs(self, f, Q=None):
+        """weak_rhs returns global weak RHS with given rhs function f
+
+        Args:
+            f: rhs function in targeting problems
+            Q: number of quadrature points
+
+        Returns:
+            a ndarray representing global weak RHS vector
+        """
+
+        fi = numpy.zeros(self.nModes, dtype=numpy.float64)
+
+        for i, e in enumerate(self.elems):
+            fi[self.l2g[i]] += e.weak_rhs(f, Q)
+
+        return fi
 
     def __call__(self, x):
         """__call__ calculate values at locations x

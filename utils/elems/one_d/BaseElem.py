@@ -9,6 +9,7 @@
 """Definition of base class of all 1D element"""
 
 import numpy
+from utils.quadrature.GaussLobattoJacobi import GaussLobattoJacobi
 
 
 class BaseElem:
@@ -88,6 +89,31 @@ class BaseElem:
 
         wLmax = numpy.max(self.wL)
         self.wL = numpy.where(numpy.abs(self.wL/wLmax) <= tol, 0, self.wL)
+
+    def weak_rhs(self, f, Q=None):
+        """weak_rhs calculates the weak RHS with given RHS function f
+
+        Args:
+            f: RHS function in the tergeting problem
+            Q: the number of quadrature points
+
+        Returns:
+            a ndarray representing elemental weak RHS
+        """
+
+        if Q is None:
+            Q = self.n_nodes + 1  # use P + 2 quadrature points for safety
+
+        qd = GaussLobattoJacobi(Q)
+
+        fi = numpy.zeros(self.n_nodes, dtype=numpy.float64)
+
+        for i, expn in enumerate(self.expn):
+            def integrand(x):
+                return self.expn[i](x) * f(self.xi_to_x(x))
+            fi[i] = qd(integrand)
+
+        return fi
 
     def x_to_xi(self, x):
         """map physical coordinate x to standard coordinate xi
