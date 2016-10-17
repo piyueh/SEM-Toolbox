@@ -66,7 +66,11 @@ class GaussJacobi(object):
         dx_dxi = (xMax - xmin) / 2
         x = (self.nodes + 1.) * dx_dxi + xmin
 
-        return numpy.sum(f(x) * dx_dxi * self.weights)
+        if callable(f):
+            return numpy.sum(f(x) * dx_dxi * self.weights)
+        else:
+            # TODO: check the type & size of f is a list/ndarray
+            return numpy.sum(f * dx_dxi * self.weights)
 
     def __repr__(self):
         """__repr__"""
