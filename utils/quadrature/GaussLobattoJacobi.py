@@ -11,7 +11,7 @@
 import numpy
 from utils.quadrature.GaussJacobi import GaussJacobi
 from utils.poly.Jacobi import Jacobi
-from utils.misc import gamma, factorial
+from utils.misc import factorial_division
 
 
 class GaussLobattoJacobi(GaussJacobi):
@@ -20,34 +20,34 @@ class GaussLobattoJacobi(GaussJacobi):
     For usage and attributes, please refer to Gauss-Jacobi class.
     """
     def _quad_points(self):
-        """__quad_points__
+        """_quad_points
 
         Calculate the locations and weights of quadrature points
         """
 
-        if self.n == 2:
-            self.nodes = numpy.array([-1., 1.])
-            self.weights = numpy.ones(2)
-        else:
-            self.nodes = numpy.array([-1.] + [0]*(self.n-2) + [1.])
-            p = Jacobi(self.n-2, self.alpha+1, self.beta+1)
-            self.nodes[1: -1] = p.roots
+        def C():
+            p = Jacobi(self.n-1, self.alpha, self.beta)
 
-        c1 = 2**(self.alpha+self.beta+1)
-        c1 *= gamma(self.alpha+self.n)
-        c1 *= gamma(self.beta+self.n)
-        c1 /= (self.n - 1)
-        c1 /= factorial(self.n-1)
-        c1 /= gamma(self.alpha+self.beta+self.n+1)
+            ans = numpy.power(2, self.alpha+self.beta+1)
+            ans /= (self.n-1)
+            ans *= factorial_division(self.n-1, self.n+self.alpha-1)
+            ans /= factorial_division(
+                self.n+self.beta-1, self.n+self.alpha+self.beta)
+            ans /= numpy.power(p(self.nodes), 2)
 
-        c2 = Jacobi(self.n-1, self.alpha, self.beta)(self.nodes)
-        self.weights = c1 / c2 / c2
-        self.weights[0] *= (self.beta + 1.)
-        self.weights[-1] *= (self.alpha + 1.)
+            return ans
 
-    def _check_order(self):
-        """Check the order of quadrature"""
+        # init quadrature points, xi, and weights, wi
+        self.nodes = numpy.zeros(self.n, dtype=numpy.float64)
+        self.weights = numpy.zeros(self.n, dtype=numpy.float64)
 
-        assert self.n >= 2, \
-            "Gauss-Lobatto-Jacobi quadrature requires " +\
-            "the order to be greater than or equal to 2"
+        # quadrature points
+        p = Jacobi(self.n-2, self.alpha+1, self.beta+1)
+        self.nodes[0] = -1.
+        self.nodes[-1] = 1.
+        self.nodes[1:-1] = p.roots
+
+        # weights
+        self.weights = C()
+        self.weights[0] *= (self.beta + 1)
+        self.weights[-1] *= (self.alpha + 1)

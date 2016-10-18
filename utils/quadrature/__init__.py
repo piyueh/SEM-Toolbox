@@ -9,6 +9,7 @@
 """__init__.py for quadrature subpackage"""
 
 from utils.quadrature.GaussJacobi import GaussJacobi
+from utils.quadrature.GaussRadauJacobi import GaussRadauJacobi
 from utils.quadrature.GaussLobattoJacobi import GaussLobattoJacobi
 
 __version__ = "alpha"

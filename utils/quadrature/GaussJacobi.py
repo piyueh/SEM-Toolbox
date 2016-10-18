@@ -13,7 +13,7 @@ Gauss-based quadrature methods.
 
 import numpy
 from utils.poly.Jacobi import Jacobi
-from utils.misc import gamma, factorial
+from utils.misc import factorial_division
 
 
 class GaussJacobi(object):
@@ -87,30 +87,35 @@ class GaussJacobi(object):
         return s
 
     def _quad_points(self):
-        """__quad_points__
+        """_quad_points
 
         Calculate the locations and weights of quadrature points
         """
 
-        if self.n == 1:
-            self.nodes = numpy.array([0.])
-            self.weights = numpy.array([2.])
-        else:
+        def H():
             p = Jacobi(self.n, self.alpha, self.beta)
-            self.nodes = p.roots
 
-            c1 = 2**(self.alpha+self.beta+1)
-            c1 *= gamma(self.alpha+self.n+1)
-            c1 *= gamma(self.beta+self.n+1)
-            c1 /= factorial(self.n)
-            c1 /= gamma(self.alpha+self.beta+self.n+1)
-            c1 /= (1. - self.nodes**2)
+            ans = numpy.power(2, self.alpha+self.beta+1)
+            ans *= factorial_division(self.n, self.n+self.alpha)
+            ans /= factorial_division(
+                self.n+self.beta, self.n+self.alpha+self.beta)
 
-            c2 = p.derive()(self.nodes)
-            self.weights = c1 / c2 / c2
+            ans /= (1. - numpy.power(self.nodes, 2))
+            ans /= numpy.power(p.derive()(self.nodes), 2)
+
+            return ans
+
+        # quadrature points
+        p = Jacobi(self.n, self.alpha, self.beta)
+        self.nodes = p.roots
+
+        # weights
+        self.weights = H()
 
     def _check_order(self):
         """Check the order of quadrature"""
 
-        assert self.n >= 1, \
-            "Gauss-Jacobi quadrature requires the order to be greater than 0"
+        if self.n < 2:
+            raise ValueError(
+                "Requires the order to be greater than 1. " +
+                "Current input n: {0}".format(self.n))
