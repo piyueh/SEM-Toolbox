@@ -12,6 +12,8 @@ import numpy
 import numbers
 import functools
 
+# TODO: replace assertion with if ... raise
+
 
 def factorial(n):
     """Naive implementation of factorial
@@ -24,12 +26,49 @@ def factorial(n):
         n!
     """
 
-    assert isinstance(n, (int, numpy.int_)), \
-        "input is not an integer: {0}, {1}".format(n, type(n))
+    if not isinstance(n, (int, numpy.int_)):
+        raise ValueError(
+            "n is not an integer: {0}, {1}".format(n, type(n)))
+
     if n == 0:
         return 1
     else:
         return functools.reduce(lambda x, y: x * y, range(1, n+1))
+
+
+def factorial_division(bg, end):
+    """Naive implementation of factorial division: end! / bg!
+
+    This function is to avoid integer overflow. If end and bg are big, it is
+    dangerous to use fractional(end) / fractional(bg) due to the potential of
+    integer overflow.
+
+    For serious use, please consider scipy.special.factorial
+
+    Args:
+        bg: the beginning integer
+        end: the endding integer
+    Returns:
+        end! / bg!
+    """
+
+    if not isinstance(bg, (int, numpy.int_)):
+        raise ValueError(
+            "bg is not an integer: {0}, {1}".format(bg, type(bg)))
+    if not isinstance(end, (int, numpy.int_)):
+        raise ValueError(
+            "end is not an integer: {0}, {1}".format(end, type(end)))
+    if bg == 0:
+        raise ValueError("bg can not be zero!")
+    if end < bg:
+        raise ValueError(
+            "end should larger than or equal to bg: " +
+            "bg={0}, end={1}".format(bg, end))
+
+    if end == bg:
+        return 1
+    else:
+        return functools.reduce(lambda x, y: x * y, range(bg+1, end+1))
 
 
 def gamma(n):
