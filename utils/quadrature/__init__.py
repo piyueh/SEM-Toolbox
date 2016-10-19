@@ -12,5 +12,9 @@ from utils.quadrature.GaussJacobi import GaussJacobi
 from utils.quadrature.GaussRadauJacobi import GaussRadauJacobi
 from utils.quadrature.GaussLobattoJacobi import GaussLobattoJacobi
 
+__methods__ = {"GaussJacobi": GaussJacobi,
+               "GaussRadauJacobi": GaussRadauJacobi,
+               "GaussLobattoJacobi": GaussLobattoJacobi}
+
 __version__ = "alpha"
 __author__ = "Pi-Yueh Chuang"

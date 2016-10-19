@@ -200,12 +200,15 @@ class BaseAssembly(object):
         for i in range(self.nElems):
             self.elems[i].set_ui(self.coeffs[self.l2g[i]])
 
-    def weak_rhs(self, f, Q=None):
+    def weak_rhs(self, f, Q=None, M="GaussLobattoJacobi", **kwargs):
         """weak_rhs returns global weak RHS with given rhs function f
 
         Args:
-            f: rhs function in targeting problems
-            Q: number of quadrature points
+            f: RHS function in the tergeting problem
+            Q: the number of quadrature points
+            M: the quadrature method. Available methods: Gauss-Jacobi, Gauss-
+                Radau-Jacobi, and Gauss-Lobatto-Jacobi
+            kwargs: optional arguments for chosen quadrature method
 
         Returns:
             a ndarray representing global weak RHS vector
@@ -214,7 +217,7 @@ class BaseAssembly(object):
         fi = numpy.zeros(self.nModes, dtype=numpy.float64)
 
         for i, e in enumerate(self.elems):
-            fi[self.l2g[i]] += e.weak_rhs(f, Q)
+            fi[self.l2g[i]] += e.weak_rhs(f, Q, M, **kwargs)
 
         return fi
 
