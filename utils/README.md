@@ -1,4 +1,4 @@
 utils
 =====
 Common components used in exercises
-(e.g. Jacobi polynomials, quadrature, derivative matrix, etc)
+(e.g. Jacobi polynomials, quadrature, derivative matrix, expansions, assembly, solvers, etc)
