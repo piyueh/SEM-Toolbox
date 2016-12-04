@@ -115,7 +115,7 @@ class GaussJacobi(object):
     def _check_order(self):
         """Check the order of quadrature"""
 
-        if self.n < 2:
+        if self.n < 1:
             raise ValueError(
-                "Requires the order to be greater than 1. " +
+                "Requires the order to be greater than 0. " +
                 "Current input n: {0}".format(self.n))

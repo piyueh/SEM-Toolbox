@@ -58,8 +58,8 @@ def factorial_division(bg, end):
     if not isinstance(end, (int, numpy.int_)):
         raise ValueError(
             "end is not an integer: {0}, {1}".format(end, type(end)))
-    if bg == 0:
-        raise ValueError("bg can not be zero!")
+    if bg < 0:
+        raise ValueError("bg can not be smaller than zero!")
     if end < bg:
         raise ValueError(
             "end should larger than or equal to bg: " +

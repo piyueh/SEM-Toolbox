@@ -51,3 +51,11 @@ class GaussLobattoJacobi(GaussJacobi):
         self.weights = C()
         self.weights[0] *= (self.beta + 1)
         self.weights[-1] *= (self.alpha + 1)
+
+    def _check_order(self):
+        """Check the order of quadrature"""
+
+        if self.n < 2:
+            raise ValueError(
+                "Lobatto requires the order to be greater than 1. " +
+                "Current input n: {0}".format(self.n))
